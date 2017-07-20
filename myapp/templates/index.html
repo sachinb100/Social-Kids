@@ -1,0 +1,93 @@
+
+<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/html">
+<head>
+    <meta charset="UTF-8">
+    <title>Instagram Clone</title>
+    <style>
+       h1{
+       color:red;
+       }
+       body{
+
+        text-align:center;
+        }
+        input[type="submit"]{
+       background:green;
+       color:white;
+       width:100px;
+       height:30px;
+
+	    }
+	     a:hover{
+       color:red;
+       }
+    </style>
+    <script>
+        function check(){
+            var user_len = document.getElementById("username");
+            var pass_len = document.getElementById("password");
+            if(user_len.value.length > 4 && pass_len.value.length > 5){
+            return true;
+            }
+            else{
+            alert("Username must be atleast 4 character or Weak Password");
+
+            return  false;
+            }
+        }
+    </script>
+
+</head>
+<body>
+    <img src="https://4h.tennessee.edu/SiteAssets/Pages/photo/nikon-photography-camera.jpg" width="200" height="=200">
+	<div class="main">
+            <h1 align="center">Social Kids</h1>
+            <h3 align="center">Sign Up</h3>
+    </div>
+
+    <div class="inline">
+        <form method="post" name="f1" onsubmit="return check()">
+        {% csrf_token %}
+            <table align="center">
+                <div>
+                    <tr>
+                        <td> <label for="username">Username: </label> </td>
+                        <td> <input id="username" type="text" name="username" value={{ username }}> </td>
+                    </tr>
+                </div>
+
+                <div>
+                    <tr>
+                        <td><label for="name">Name: </label></td>
+                        <td><input id="name" type="text" name="name" value={{ name }}></td>
+                    </tr>
+                </div>
+
+
+                <div>
+                    <tr>
+                        <td><label for="email">Email: </label></td>
+                        <td><input id="email" type="text" name="email" value={{ email }}></td>
+                    </tr>
+                </div>
+
+                <div>
+                    <tr>
+                        <td><label for="password">Password: </label></td>
+                        <td><input id="password" type="password" name="password" value={{ password }}></td>
+                    </tr>
+                </div>
+            </table>
+            <br>
+                <input type="submit" value="Sign Up" >
+
+        </form>
+
+
+    </div><br><br>
+
+    <div><h3>Already a user?</h3><a href="login/">Login</a> </div>
+</body>
+</html>
