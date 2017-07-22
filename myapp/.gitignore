@@ -12,3 +12,4 @@ _init_.py
 migrations/*
 sg.pyc
 admin.pyc
+details.txt

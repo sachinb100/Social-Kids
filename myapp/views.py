@@ -10,12 +10,22 @@ from django.utils import timezone
 from mysite.settings import BASE_DIR
 from django.contrib import messages
 
+#for uploading image on feed
 from imgurpython import ImgurClient
 
+#import statement for sending mail to user
 import sendgrid
 from sg import API_KEY,YOUR_CLIENT_ID,YOUR_CLIENT_SECRET
 from sendgrid.helpers.mail import *
 
+#for image recognition
+from myapp.sg import KEY
+from clarifai import *
+from clarifai.rest  import ClarifaiApp
+
+#for text analysis
+from paralleldots import set_api_key, sentiment
+from myapp.sg import PKEY
 
 # Create your views here.
 
@@ -77,6 +87,7 @@ def post_view(request):
     if user:
         if request.method == 'POST':
             form = PostForm(request.POST, request.FILES)
+
             if form.is_valid():
                 image = form.cleaned_data.get('image')
                 caption = form.cleaned_data.get('caption')
@@ -88,10 +99,30 @@ def post_view(request):
                 client = ImgurClient(YOUR_CLIENT_ID, YOUR_CLIENT_SECRET)
 
                 post.image_url = client.upload_from_path(path, anon=True)['link']
-                post.save()
+                #Creating instance of an API with KEY
+                app = ClarifaiApp(api_key=KEY)
 
-                success_message = 'Post can be submitted'
-                return render(request, 'post.html', {'success_message': success_message})
+                model = app.models.get('nsfw-v1.0')
+
+                response_image = model.predict_by_url(url=post.image_url)
+                safe=response_image['outputs'][0]['data']['concepts'][0]['value']
+
+                set_api_key(PKEY)
+
+
+                response = sentiment(str(caption))
+
+                sentiment_value = response['sentiment']
+
+                if sentiment_value > 0.6 and safe > 0.6:
+                    post.save()
+                    success_message = 'Post can be submitted'
+                    return render(request, 'post.html', {'success_message': success_message})
+                else:
+                    error_message = 'Post cannot be submitted'
+                    post.delete()
+                    return render(request, 'post.html', {'error_message': error_message})
+
                 return redirect('/feed/')
 
 
