@@ -1,0 +1,5 @@
+'Social Kids'  is a social network that is safe for kids. It should make sure that images and text is appropriate for kids under the age of 12.
+For this to check how right the image is for kids 'clarifai' api is used and to check how right the caption is for kids 'paralleldots'api is used.
+Some extra things in this apploication are:
+When like and comment is done on user's  post an email is sent to that user with help of 'sendgrid' api.
+To check the post of paricular user,pass the name of user in url '/feeds/user_name'. If no post is there user's feed is shown empty.
