@@ -17,7 +17,7 @@ from django.conf.urls import url
 from django.contrib import admin
 from django.conf import settings
 from django.conf.urls.static import static
-from myapp.views import login_view,post_view,signup_view,feed_view,like_view,comment_view
+from myapp.views import login_view,post_view,signup_view,feed_view,like_view,comment_view,upvote_view,particular_view
 
 urlpatterns = [
     url('post/', post_view),
@@ -25,5 +25,9 @@ urlpatterns = [
     url('feed/', feed_view),
     url('like/', like_view),
     url('comment/', comment_view),
+    url('upvote/', upvote_view),
+    # url(r'^feed/(<username>)$',particular_view,name="username"),
+    url(r'^feeds/(?P<name>[\w.@+-]+)$',particular_view),
+
     url('',signup_view)
 ]
