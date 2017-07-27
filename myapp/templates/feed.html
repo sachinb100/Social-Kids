@@ -28,11 +28,12 @@
         <h1 align="center">Social Kids</h1>
         <input type="submit" class="btn-default btn" value="Create Post">
     </form>
-     <form method="post" action="/login/">
+    <form method="post" action="/login/">
          {% csrf_token %}
          <input type="submit" class="btn-default btn" value="Logout" style="float:right;">
     </form>
     <br>
+
 
     {% for post in posts %}
 
@@ -67,11 +68,41 @@
             </form>
         </div>
 
-        <div>
-            {% for comment in post.comments %}
-                <p><b>{{ comment.user.username }} [{{ comment.created_on }}]:</b> {{ comment.comment_text }}</p>
-            {% endfor %}
+        <div style="display:inline-block">
+
+                {% for comment in post.comments %}
+                    <p><b>{{ comment.user.username }} [{{ comment.created_on }}]:</b> {{ comment.comment_text }}</p><br>
+            <div style="display:inline-block">
+                {{ comment.upvote_count }} upvote this comment
+            </div>
+            <div style="display:inline-block">
+                 <form method="POST" action="/upvote/">
+                    {% csrf_token %}
+                     <input type="hidden" name="comment" value="{{ comment.id }}" />
+                        {% if commment.has_upvoted %}
+                        <input type="submit" class="btn btn-default" value="Downvote">
+                        {% else %}
+                        <input type="submit" class="btn btn-default" value="Upvote">
+                        {% endif %}
+                 </form>
+            </div>
+
+                {% endfor %}
         </div>
+
+
+       <!--<div style="display:inline-block">-->
+            <!--<form method="POST" action="/upvote/">-->
+              <!--{% csrf_token %}-->
+              <!--<input type="hidden" name="post" value="{{ post.id }}" />-->
+                <!--{% if post.has_liked %}-->
+                <!--<input type="submit" class="btn btn-default" value="Unlike">-->
+                <!--{% else %}-->
+                <!--&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-->
+                <!--<input type="submit" class="btn btn-default" value="Upvote">-->
+                <!--{% endif %}-->
+            <!--</form>-->
+        <!--</div>-->
 
     {% endfor %}
 </body>

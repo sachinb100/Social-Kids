@@ -2,9 +2,9 @@
 from __future__ import unicode_literals
 
 from django.shortcuts import render,redirect
-from myapp.forms import SignUpForm,LoginForm,PostForm,LikeForm,CommentForm
+from myapp.forms import SignUpForm,LoginForm,PostForm,LikeForm,CommentForm,UpvoteForm
 from django.contrib.auth.hashers import make_password,check_password
-from myapp.models import UserModel,SessionToken,PostModel,LikeModel,CommentModel
+from myapp.models import UserModel,SessionToken,PostModel,LikeModel,CommentModel,UpvoteModel
 from datetime import timedelta
 from django.utils import timezone
 from mysite.settings import BASE_DIR
@@ -143,9 +143,27 @@ def feed_view(request):
     user = check_validation(request)
     if user:
         posts = PostModel.objects.all().order_by('-created_on')
+        for post in posts:
+            existing_like = LikeModel.objects.filter(post_id=post.id, user=user).first()
+            comments = CommentModel.objects.filter(post_id=post.id)
+            # if comments:
+            #     if len(comments) >= 1:
+            #         for comment in comments:
+            #             existing_upvote = UpvoteModel.objects.filter(comment=comment.id).first()
+            #             print existing_upvote
+            #
+            #             if existing_upvote:
+            #                 comment.has_upvoted = True
+
+            if existing_like:
+                post.has_liked = True
         return render(request, 'feed.html', {'posts': posts})
+
     else:
         return redirect('/login/')
+
+
+
 
 
 
@@ -201,7 +219,7 @@ def comment_view(request):
         else:
             return redirect('/feed/')
     else:
-        return redirect('/login')
+        return redirect('/login/')
 
 
 # For validating the session
@@ -214,3 +232,50 @@ def check_validation(request):
                 return session.user
     else:
         return None
+
+# To view the post of particular user.
+def particular_view(request,name):
+    user = check_validation(request)
+    print user
+    if user:
+        username = UserModel.objects.all().filter(username=name)
+        print username.values_list('username')
+        posts = PostModel.objects.all().filter(user=username).order_by('-created_on')
+        return render(request, 'feed.html', {'posts': posts})
+
+    else:
+        return redirect('/login/')
+
+#to like the post
+def upvote_view(request):
+    user = check_validation(request)
+    if user and request.method == 'POST':
+        form = UpvoteForm(request.POST)
+        if form.is_valid():
+            print "Form valid"
+            comment_id = form.cleaned_data.get('comment').id
+            print comment_id
+            existing_upvote = UpvoteModel.objects.filter(comment_id=comment_id, user=user).first()
+            print existing_upvote
+
+            if not existing_upvote:
+                print "Upvote"
+
+                upvote=UpvoteModel.objects.create(comment_id=comment_id, user=user)
+                print upvote
+                print UpvoteModel.objects.filter(comment=comment_id)
+                upvote.save()
+                print "Post is upvoted."
+                return redirect('/feed/')
+
+
+            else:
+                print "Post is downvote"
+                existing_upvote.delete()
+            return redirect('/feed/')
+        else:
+            print "Form is not valid"
+            return redirect('/feed/')
+    else:
+        return redirect('/login/')
+
